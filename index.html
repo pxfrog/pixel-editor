@@ -212,8 +212,14 @@
     </main>
 
     <script>
+        console.log("Pixel Editor Initializing...");
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        if (!ctx) {
+            alert("Canvas context not supported!");
+        }
+
         const colorTrigger = document.getElementById('color-trigger');
         const colorPicker = document.getElementById('color-picker');
         
