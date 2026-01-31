@@ -2,326 +2,369 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ada's Pixel Art Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PXFROG | Pixel Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #1a1a1a;
-            --ui: #2d2d2d;
-            --text: #e0e0e0;
-            --accent: #4a9eff;
+            --ui: #262626;
+            --primary: #4ade80;
+            --secondary: #22c55e;
+            --text: #f0f0f0;
+            --border-width: 4px;
+        }
+
+        * {
+            box-sizing: border-box;
+            image-rendering: pixelated;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background: var(--bg);
+            background-color: var(--bg);
             color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'VT323', monospace;
+            margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            margin: 0;
             height: 100vh;
             overflow: hidden;
         }
 
         header {
-            padding: 1rem;
-            width: 100%;
+            background: repeating-linear-gradient(45deg, #1a1a1a, #1a1a1a 10px, #222 10px, #222 20px);
+            border-bottom: var(--border-width) solid var(--primary);
+            padding: 10px;
             text-align: center;
-            background: var(--ui);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            color: var(--primary);
+            margin: 0;
+            text-shadow: 2px 2px 0px #000;
         }
 
         main {
             display: flex;
             flex: 1;
-            width: 100%;
-            gap: 1rem;
-            padding: 1rem;
-            box-sizing: border-box;
-            justify-content: center;
+            padding: 10px;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        /* Pixel Container */
+        .pixel-border {
+            border: var(--border-width) solid #000;
+            box-shadow: 
+                inset -4px -4px 0px 0px #333,
+                inset 4px 4px 0px 0px #666;
+            background: var(--ui);
         }
 
         #toolbar {
-            background: var(--ui);
-            padding: 1rem;
-            border-radius: 8px;
+            width: 70px;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-            width: 80px;
+            gap: 8px;
+            padding: 8px;
         }
 
         .tool {
-            width: 50px;
-            height: 50px;
-            background: #3d3d3d;
-            border: 2px solid transparent;
-            border-radius: 4px;
-            cursor: pointer;
+            width: 100%;
+            aspect-ratio: 1;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            background: #444;
+            border: 2px solid #000;
+            box-shadow: -2px 2px 0px #000;
+            cursor: pointer;
             font-size: 1.2rem;
         }
 
         .tool.active {
-            border-color: var(--accent);
-            background: #444;
+            background: var(--primary);
+            box-shadow: 0 0 0 #000;
+            transform: translate(-2px, 2px);
         }
 
         #canvas-container {
             flex: 1;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             background: #111;
-            border-radius: 8px;
-            overflow: hidden;
             position: relative;
-            background-image: 
-                linear-gradient(45deg, #222 25%, transparent 25%),
-                linear-gradient(-45deg, #222 25%, transparent 25%),
-                linear-gradient(45deg, transparent 75%, #222 75%),
-                linear-gradient(-45deg, transparent 75%, #222 75%);
-            background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            overflow: hidden;
             touch-action: none;
         }
 
         canvas {
-            image-rendering: pixelated;
+            background: #fff;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            background: white;
-            cursor: crosshair;
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 95%;
+            max-height: 95%;
             object-fit: contain;
+        }
+
+        #sidebar {
+            width: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+        }
+
+        .swatch {
+            aspect-ratio: 1;
+            border: 2px solid #000;
+            cursor: pointer;
+        }
+
+        .swatch.active {
+            outline: 2px solid var(--primary);
+            outline-offset: 1px;
+        }
+
+        .pixel-button {
+            background: var(--primary);
+            color: #000;
+            border: 3px solid #000;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            padding: 8px;
+            cursor: pointer;
+            box-shadow: -3px 3px 0px #000;
+        }
+
+        .pixel-button:active {
+            box-shadow: 0 0 0 #000;
+            transform: translate(-3px, 3px);
+        }
+
+        #color-picker-btn {
+            width: 100%;
+            height: 40px;
+            padding: 0;
+            border: 3px solid #000;
+            cursor: pointer;
         }
 
         @media (max-width: 768px) {
             main {
                 flex-direction: column;
-                overflow-y: auto;
             }
             #toolbar {
                 width: 100%;
                 flex-direction: row;
-                height: auto;
-                justify-content: center;
-                box-sizing: border-box;
+                height: 60px;
             }
             #sidebar {
                 width: 100%;
-                box-sizing: border-box;
+                height: auto;
             }
             #canvas-container {
-                min-height: 350px;
+                min-height: 250px;
+            }
+            .palette {
+                grid-template-columns: repeat(8, 1fr);
             }
         }
     </style>
 </head>
 <body>
     <header>
-        Ada's Pixel Editor
+        <h1>PXFROG EDITOR V1.0</h1>
     </header>
     <main>
-        <div id="toolbar">
-            <div class="tool active" id="btn-pencil" title="铅笔 (P)">✏️</div>
-            <div class="tool" id="btn-eraser" title="橡皮 (E)">🧼</div>
-            <div class="tool" id="btn-bucket" title="油漆桶 (B)">🪣</div>
-            <input type="color" id="color-picker" style="width: 50px; height: 50px; padding:0; border:none; cursor:pointer; background:none;">
-        </div>
-        
-        <div id="canvas-container">
-            <canvas id="pixel-canvas"></canvas>
+        <div id="toolbar" class="pixel-border">
+            <div class="tool active" id="tool-pencil">✏️</div>
+            <div class="tool" id="tool-eraser">🧼</div>
+            <div class="tool" id="tool-bucket">🪣</div>
+            <input type="color" id="color-picker" style="display:none">
+            <div class="tool" id="color-trigger" style="background:#000"></div>
         </div>
 
-        <div id="sidebar">
-            <div class="section">
-                <div>调色盘</div>
-                <div class="color-palette" id="palette"></div>
-            </div>
-            <hr style="width:100%; opacity:0.1;">
-            <button id="btn-download">下载 PNG</button>
-            <button id="btn-clear" style="background:#ff4a4a;">清空</button>
-            <div id="status">画布大小: 32x32</div>
+        <div id="canvas-container" class="pixel-border">
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <div id="sidebar" class="pixel-border">
+            <div style="font-family:'Press Start 2P'; font-size:0.5rem; margin-bottom:5px;">PALETTE</div>
+            <div class="palette" id="palette"></div>
+            <div style="flex:1"></div>
+            <button class="pixel-button" id="btn-save">DOWNLOAD</button>
+            <button class="pixel-button" id="btn-clear" style="background:#ff4a4a">CLEAR</button>
+            <div id="status" style="font-size:0.8rem; opacity:0.6; text-align:center;">32 X 32</div>
         </div>
     </main>
 
     <script>
-        const canvas = document.getElementById('pixel-canvas');
-        const ctx = canvas.getContext('2d');
-        const paletteContainer = document.getElementById('palette');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const colorTrigger = document.getElementById('color-trigger');
         const colorPicker = document.getElementById('color-picker');
         
         const GRID_SIZE = 32;
-        const SCALE = 20;
-        
-        canvas.width = GRID_SIZE * SCALE;
-        canvas.height = GRID_SIZE * SCALE;
+        const CELL = 20;
+        canvas.width = canvas.height = GRID_SIZE * CELL;
+        ctx.imageSmoothingEnabled = false;
 
         let isDrawing = false;
-        let currentColor = '#000000';
-        let currentTool = 'pencil';
-        
+        let color = '#000000';
+        let tool = 'pencil';
+
         const colors = [
-            '#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', 
-            '#ffff00', '#ff00ff', '#00ffff', '#888888', '#444444',
+            '#000000', '#ffffff', '#ff4a4a', '#4ade80', '#60a5fa', 
+            '#facc15', '#a855f7', '#fb923c', '#444444', '#888888',
             '#aa0000', '#00aa00', '#0000aa', '#aaaa00', '#aa00aa', '#00aaaa'
         ];
 
-        // 初始化
         function init() {
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0,0, canvas.width, canvas.height);
             
-            colors.forEach(color => {
-                const swatch = document.createElement('div');
-                swatch.className = 'color-swatch';
-                swatch.style.backgroundColor = color;
-                swatch.onclick = () => selectColor(color, swatch);
-                paletteContainer.appendChild(swatch);
-                if (color === currentColor) swatch.classList.add('active');
+            colors.forEach(c => {
+                const s = document.createElement('div');
+                s.className = 'swatch';
+                s.style.backgroundColor = c;
+                s.onclick = () => selectColor(c, s);
+                document.getElementById('palette').appendChild(s);
+                if (c === color) s.classList.add('active');
             });
-            
-            colorPicker.value = currentColor;
-            colorPicker.oninput = (e) => selectColor(e.target.value);
+            colorTrigger.style.backgroundColor = color;
         }
 
-        function selectColor(color, swatch) {
-            currentColor = color;
-            colorPicker.value = color;
-            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-            if (swatch) swatch.classList.add('active');
+        function selectColor(c, el) {
+            color = c;
+            colorTrigger.style.backgroundColor = c;
+            document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+            if (el) el.classList.add('active');
         }
 
-        function getEventPos(e) {
+        colorTrigger.onclick = () => colorPicker.click();
+        colorPicker.oninput = (e) => selectColor(e.target.value);
+
+        function getPos(e) {
             const rect = canvas.getBoundingClientRect();
-            let clientX, clientY;
-            
-            if (e.touches) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
+            let cx, cy;
+            if (e.touches && e.touches.length > 0) {
+                cx = e.touches[0].clientX;
+                cy = e.touches[0].clientY;
+            } else if (e.changedTouches && e.changedTouches.length > 0) {
+                cx = e.changedTouches[0].clientX;
+                cy = e.changedTouches[0].clientY;
             } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
+                cx = e.clientX;
+                cy = e.clientY;
             }
-            
-            const x = Math.floor((clientX - rect.left) / (rect.width / GRID_SIZE));
-            const y = Math.floor((clientY - rect.top) / (rect.height / GRID_SIZE));
+            const x = Math.floor((cx - rect.left) / (rect.width / GRID_SIZE));
+            const y = Math.floor((cy - rect.top) / (rect.height / GRID_SIZE));
             return { x, y };
         }
 
         function draw(e) {
             if (!isDrawing) return;
             if (e.cancelable) e.preventDefault();
-            
-            const { x, y } = getEventPos(e);
-            
-            if (currentTool === 'pencil') {
-                ctx.fillStyle = currentColor;
-                ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
-            } else if (currentTool === 'eraser') {
-                ctx.fillStyle = 'white';
-                ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
+            const { x, y } = getPos(e);
+            if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) return;
+
+            if (tool === 'pencil') {
+                ctx.fillStyle = color;
+                ctx.fillRect(x * CELL, y * CELL, CELL, CELL);
+            } else if (tool === 'eraser') {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(x * CELL, y * CELL, CELL, CELL);
             }
         }
 
-        const handleStart = (e) => {
-            isDrawing = true;
-            if (currentTool === 'bucket') {
-                floodFill(e);
-            } else {
-                draw(e);
-            }
-        };
-
-        const handleEnd = () => isDrawing = false;
-
-        // 鼠标事件
-        canvas.onmousedown = handleStart;
-        window.addEventListener('mouseup', handleEnd);
-        canvas.onmousemove = draw;
-
-        // 触摸事件
-        canvas.addEventListener('touchstart', handleStart, {passive: false});
-        canvas.addEventListener('touchend', handleEnd);
-        canvas.addEventListener('touchmove', draw, {passive: false});
-
-        // 简单的油漆桶算法 (扫描线填充较复杂，这里用基础递归或模拟)
         function floodFill(e) {
-            const { x, y } = getMousePos(e);
-            const targetColor = getPixelColor(x, y);
-            if (targetColor === currentColor) return;
-            
-            const fill = (x, y) => {
-                if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) return;
-                if (getPixelColor(x, y) !== targetColor) return;
-                
-                ctx.fillStyle = currentColor;
-                ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
-                
-                fill(x + 1, y);
-                fill(x - 1, y);
-                fill(x, y + 1);
-                fill(x, y - 1);
-            };
-            // 为了防止栈溢出，小型画布可用递归，大画布需用队列
-            fill(x, y);
+            const { x, y } = getPos(e);
+            const target = getHex(x, y);
+            if (target === color.toLowerCase()) return;
+
+            const stack = [[x, y]];
+            while (stack.length > 0) {
+                const [cx, cy] = stack.pop();
+                if (cx < 0 || cx >= GRID_SIZE || cy < 0 || cy >= GRID_SIZE) continue;
+                if (getHex(cx, cy) !== target) continue;
+
+                ctx.fillStyle = color;
+                ctx.fillRect(cx * CELL, cy * CELL, CELL, CELL);
+
+                stack.push([cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]);
+            }
         }
 
-        function getPixelColor(x, y) {
-            const data = ctx.getImageData(x * SCALE + 1, y * SCALE + 1, 1, 1).data;
-            return `#${((1 << 24) + (data[0] << 16) + (data[1] << 8) + data[2]).toString(16).slice(1)}`;
+        function getHex(x, y) {
+            const d = ctx.getImageData(x * CELL + 1, y * CELL + 1, 1, 1).data;
+            return "#" + ((1 << 24) + (d[0] << 16) + (d[1] << 8) + d[2]).toString(16).slice(1);
         }
 
-        // 工具切换
-        document.getElementById('btn-pencil').onclick = () => setTool('pencil');
-        document.getElementById('btn-eraser').onclick = () => setTool('eraser');
-        document.getElementById('btn-bucket').onclick = () => setTool('bucket');
+        const start = (e) => {
+            isDrawing = true;
+            if (tool === 'bucket') floodFill(e);
+            else draw(e);
+        };
+        const end = () => isDrawing = false;
 
-        function setTool(tool) {
-            currentTool = tool;
-            document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
-            document.getElementById(`btn-${tool}`).classList.add('active');
+        canvas.addEventListener('mousedown', start);
+        window.addEventListener('mouseup', end);
+        canvas.addEventListener('mousemove', draw);
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.cancelable) e.preventDefault();
+            start(e);
+        }, {passive: false});
+        canvas.addEventListener('touchend', end);
+        canvas.addEventListener('touchmove', (e) => {
+            if (e.cancelable) e.preventDefault();
+            draw(e);
+        }, {passive: false});
+
+        function setTool(t) {
+            tool = t;
+            document.querySelectorAll('.tool').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tool-${t}`).classList.add('active');
         }
 
-        // 下载
-        document.getElementById('btn-download').onclick = () => {
-            // 创建一个小尺寸的临时画布来保存原始像素
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = GRID_SIZE;
-            tempCanvas.height = GRID_SIZE;
-            const tempCtx = tempCanvas.getContext('2d');
-            
-            // 将大画布内容缩小回 32x32
+        document.getElementById('tool-pencil').onclick = () => setTool('pencil');
+        document.getElementById('tool-eraser').onclick = () => setTool('eraser');
+        document.getElementById('tool-bucket').onclick = () => setTool('bucket');
+
+        document.getElementById('btn-save').onclick = () => {
+            const temp = document.createElement('canvas');
+            temp.width = temp.height = GRID_SIZE;
+            const tctx = temp.getContext('2d');
             for(let y=0; y<GRID_SIZE; y++) {
                 for(let x=0; x<GRID_SIZE; x++) {
-                    const color = getPixelColor(x, y);
-                    tempCtx.fillStyle = color;
-                    tempCtx.fillRect(x, y, 1, 1);
+                    tctx.fillStyle = getHex(x, y);
+                    tctx.fillRect(x, y, 1, 1);
                 }
             }
-            
-            const link = document.createElement('a');
-            link.download = 'pixel-art.png';
-            link.href = tempCanvas.toDataURL();
-            link.click();
+            const a = document.createElement('a');
+            a.download = 'pxfrog-art.png';
+            a.href = temp.toDataURL();
+            a.click();
         };
 
         document.getElementById('btn-clear').onclick = () => {
-            if (confirm('确定要清空吗？')) {
-                ctx.fillStyle = 'white';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            if(confirm('CLEAR CANVAS?')) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0,0, canvas.width, canvas.height);
             }
-        };
-
-        // 快捷键
-        window.onkeydown = (e) => {
-            if (e.key === 'p') setTool('pencil');
-            if (e.key === 'e') setTool('eraser');
-            if (e.key === 'b') setTool('bucket');
         };
 
         init();
